@@ -196,10 +196,9 @@ def stochatreat(
     treat_mask = np.repeat(
         treatment_ids, (lcm_prob_denominators * probs_np).round().astype(int)
     )
-    # count the # of treatment_ids in treat_mask for 0 to max treatment_ids
-    treat_mask_counts = {tid: np.sum(treat_mask == tid) for tid in range(np.max(treatment_ids)}
-    print(f"Treatment assignment counts in treat_mask: {treat_mask_counts}")
-
+    unique_elements, counts = np.unique(treat_mask, return_counts=True)
+    for element, count in zip(unique_elements, counts):
+        print(f"Element {element}: {count} occurrences")
 
     # =========================================================================
     # re-arrange strata
@@ -236,12 +235,16 @@ def stochatreat(
     # `lcm_prob_denominators`
     fake = pd.DataFrame({"fake": data.groupby("stratum_id").size()})
     fake = fake.reset_index()
+    print(f"-----fake: {fake}")
     fake.loc[:, "fake"] = (
         lcm_prob_denominators - fake["fake"] % lcm_prob_denominators
     ) % lcm_prob_denominators
     fake_rep = pd.DataFrame(
         fake.values.repeat(fake["fake"], axis=0), columns=fake.columns
     )
+    # Print summary statistics for each group in the 'fake' DataFrame grouped by 'stratum_id'
+    print("----- Summary statistics for each stratum_id in 'fake':")
+    print(fake_rep.groupby('stratum_id').describe())
     # Before we add fake data, protect the idx_col values from being upcasted
     # to a different type and mutating the original data due to the
     # introduction of nulls. We will restore the original type later.
