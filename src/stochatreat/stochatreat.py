@@ -252,13 +252,14 @@ def stochatreat(
     data.loc[:, "fake"] = 0
     fake_rep.loc[:, "fake"] = 1
 
-    data = pd.concat([data, fake_rep], sort=False).sort_values(by="stratum_id")
+    data = pd.concat([data, fake_rep], sort=False).sort_values(by="stratum_id", kind="stable")
 
     # generate random permutations without loop by generating large number of
     # random values and sorting row (meaning one permutation) wise
     permutations = np.argsort(
         rand.rand(len(data) // lcm_prob_denominators, lcm_prob_denominators),
         axis=1,
+        stable=True,
     )
     # lookup treatment name for permutations. This works because we flatten
     # row-major style, i.e. one row after another.
