@@ -189,12 +189,17 @@ def stochatreat(
     # convert all probs to fractions and get the lowest common multiple of
     # their denominators
     lcm_prob_denominators = get_lcm_prob_denominators(probs_np)
+    print(f"-----lcm_prob_denominators for probs {probs_np}: {lcm_prob_denominators} and treatment_ids {treatment_ids}")
 
     # produce the assignment mask that we will use to achieve perfect
     # proportions
     treat_mask = np.repeat(
         treatment_ids, (lcm_prob_denominators * probs_np).round().astype(int)
     )
+    # count the # of treatment_ids in treat_mask for 0 to max treatment_ids
+    treat_mask_counts = {tid: np.sum(treat_mask == tid) for tid in range(np.max(treatment_ids)}
+    print(f"Treatment assignment counts in treat_mask: {treat_mask_counts}")
+
 
     # =========================================================================
     # re-arrange strata
